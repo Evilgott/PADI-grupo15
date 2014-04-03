@@ -23,7 +23,7 @@ namespace Server
 
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteServer),
-                "MyRemoteObjectName",
+                "Server_" + _port,
                 WellKnownObjectMode.Singleton);
         }
 
@@ -32,10 +32,6 @@ namespace Server
             System.Console.Write("Insert the server port: ");
             int port = Convert.ToInt32(System.Console.ReadLine());
             Server server = new Server(port);
-            
-
-
-
             
 
             System.Console.WriteLine("<enter> para sair...");

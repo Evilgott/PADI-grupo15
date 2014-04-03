@@ -10,17 +10,28 @@ using PADI_Library;
 
 namespace MasterServer
 {
-    class MasterServer
+    class MasterServer : RemoteMasterServer
     {
-        static void Main(string[] args)
+        private TcpChannel _channel;
+        private int _port;
+
+        MasterServer(int port)
         {
-            TcpChannel channel = new TcpChannel(8086);
-            ChannelServices.RegisterChannel(channel, true);
+            _port = port;
+            _channel = new TcpChannel(_port);
+            ChannelServices.RegisterChannel(_channel, true);
 
             RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(RemoteMasterServer),
-                "MyRemoteObjectName",
+                typeof(RemoteServer),
+                "MasterServer",
                 WellKnownObjectMode.Singleton);
+        }
+        static void Main(string[] args)
+        {
+            System.Console.Write("Insert the server port: ");
+            int port = Convert.ToInt32(System.Console.ReadLine());
+            MasterServer server = new MasterServer(port);
+
 
             System.Console.WriteLine("<enter> para sair...");
             System.Console.ReadLine();
