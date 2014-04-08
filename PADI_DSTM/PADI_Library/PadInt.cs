@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace PADI_Library
 {
-    public class RemoteMasterServer : MarshalByRefObject
+    public class PadInt : MarshalByRefObject
     {
+       private int shared;
     }
 }

@@ -10,7 +10,7 @@ using PADI_Library;
 
 namespace Server
 {
-    class Server : RemoteServer
+    class Server
     {
         private TcpChannel _channel;
         private int _port;
