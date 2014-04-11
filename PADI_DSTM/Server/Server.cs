@@ -43,7 +43,7 @@ namespace Server
                 typeof(RemoteMasterServer),
                 "tcp://localhost:8086/MasterServer");
 
-            Console.WriteLine("Server iniciou: " + _rMasterServer.registerServer("tcp://localhost:"+_port+"/Server"));
+            Console.WriteLine("Server iniciou como " + _rMasterServer.registerServer("tcp://localhost:"+_port+"/Server"));
         }
 
         static void Main(string[] args)

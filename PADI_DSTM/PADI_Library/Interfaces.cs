@@ -17,17 +17,17 @@ namespace PADI_Library
         private ArrayList _secondaryServers = new ArrayList();
         private Dictionary<PadInt, Tuple<RemoteServer,RemoteServer>> _servers;
 
-        public bool registerServer(String serverURL)
+        public String registerServer(String serverURL)
         {
             if (_primaryServers.Count % 2 == 0)
             {
                 _primaryServers.Add(serverURL);
-                return true;
+                return "primary";
             }
             else
             {
                 _secondaryServers.Add(serverURL);
-                return false;
+                return "secondary";
             }
                 
         }
