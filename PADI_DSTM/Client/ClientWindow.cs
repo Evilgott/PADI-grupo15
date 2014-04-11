@@ -33,9 +33,9 @@ namespace Client
 
         private void connectToMasterServer()
         {
-            _channel = new TcpChannel(8086);
+            _channel = new TcpChannel();
             ChannelServices.RegisterChannel(_channel, true);
-            InitializeRemoteMasterServer();
+            //InitializeRemoteMasterServer();
 
             _rMasterServer = (RemoteMasterServer)Activator.GetObject(
                 typeof(RemoteMasterServer),
@@ -44,6 +44,27 @@ namespace Client
 
         private void ClientWindow_Load(object sender, EventArgs e)
         {
+
+        }
+        /*
+         * Code to test functions responsible for the server state
+         */
+        private void failButton_Click(object sender, EventArgs e)
+        {
+            Library lib = new Library();
+            lib.Freeze("tcp://localhost:1001/Server");
+        }
+
+        private void getStatusButton_Click(object sender, EventArgs e)
+        {
+            Library lib = new Library();
+            bool res = lib.Status();
+        }
+
+        private void startConButton_Click(object sender, EventArgs e)
+        {
+            InitializeRemoteMasterServer();
+            connectToMasterServer();
 
         }
     }

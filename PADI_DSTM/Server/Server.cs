@@ -21,12 +21,11 @@ namespace Server
         {
             _port = port;
             _channel = new TcpChannel(_port);
-            _serverName = "Server_" + _port;
             ChannelServices.RegisterChannel(_channel, true);
 
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteServer),
-                _serverName,
+                "Server",
                 WellKnownObjectMode.Singleton);
         }
 
@@ -44,7 +43,7 @@ namespace Server
                 typeof(RemoteMasterServer),
                 "tcp://localhost:8086/MasterServer");
 
-            Console.WriteLine("Server iniciou: " + _rMasterServer.registerServer("tcp://localhost:"+_port+"/" + _serverName));
+            Console.WriteLine("Server iniciou: " + _rMasterServer.registerServer("tcp://localhost:"+_port+"/Server"));
         }
 
         static void Main(string[] args)
