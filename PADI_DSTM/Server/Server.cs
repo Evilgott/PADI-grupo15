@@ -14,7 +14,6 @@ namespace Server
     {
         private TcpChannel _channel;
         private int _port;
-        private enum _state { normal, frozen, failing };
 
         Server(int port)
         {
