@@ -28,7 +28,7 @@ namespace Client
         private void InitializeRemoteMasterServer()
         {
             RemotingConfiguration.RegisterWellKnownClientType(
-            typeof(RemoteMasterServer), "tcp : // <ip-address >:< 8086 > /MasterServer"); //port e ip address fixos, MasterServer
+            typeof(RemoteMasterServer), "tcp://localhost:8086/MasterServer"); //port e ip address fixos, MasterServer
         }
 
         private void connectToMasterServer()
@@ -39,7 +39,7 @@ namespace Client
 
             _rMasterServer = (RemoteMasterServer)Activator.GetObject(
                 typeof(RemoteMasterServer),
-                "tcp : // <ip-address >:< 8086 > /MasterServer");
+                "tcp://localhost:8086/MasterServer");
         }
 
         private void ClientWindow_Load(object sender, EventArgs e)

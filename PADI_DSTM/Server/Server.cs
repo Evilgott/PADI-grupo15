@@ -14,17 +14,37 @@ namespace Server
     {
         private TcpChannel _channel;
         private int _port;
+        String _serverName;
+        private RemoteMasterServer _rMasterServer;
 
         Server(int port)
         {
             _port = port;
             _channel = new TcpChannel(_port);
+            _serverName = "Server_" + _port;
             ChannelServices.RegisterChannel(_channel, true);
 
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(RemoteServer),
-                "Server_" + _port,
+                _serverName,
                 WellKnownObjectMode.Singleton);
+        }
+
+        private void InitializeRemoteMasterServer()
+        {
+            RemotingConfiguration.RegisterWellKnownClientType(
+            typeof(RemoteMasterServer), "tcp://localhost:8086/MasterServer"); //port e ip address fixos, MasterServer
+        }
+
+        private void registerOnMasterServer()
+        {
+            InitializeRemoteMasterServer();
+
+            _rMasterServer = (RemoteMasterServer)Activator.GetObject(
+                typeof(RemoteMasterServer),
+                "tcp://localhost:8086/MasterServer");
+
+            Console.WriteLine("Server iniciou: " + _rMasterServer.registerServer("tcp://localhost:"+_port+"/" + _serverName));
         }
 
         static void Main(string[] args)
@@ -32,7 +52,8 @@ namespace Server
             System.Console.Write("Insert the server port: ");
             int port = Convert.ToInt32(System.Console.ReadLine());
             Server server = new Server(port);
-            
+
+            server.registerOnMasterServer();
 
             System.Console.WriteLine("<enter> para sair...");
             System.Console.ReadLine();
