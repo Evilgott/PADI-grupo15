@@ -13,7 +13,8 @@ namespace MasterServer
     class MasterServer
     {
         private TcpChannel _channel;
-        private int _port;
+        private int _port, _transactionId;
+        private Dictionary<int, Dictionary<RemoteServer,RemoteServer>> _servers;
 
         MasterServer(int port)
         {
