@@ -9,7 +9,7 @@ namespace PADI_Library
     public class RemoteMasterServer : MarshalByRefObject
     {
         private int _tId;
-        private Dictionary<PadInt, KeyValuePair<RemoteServer,RemoteServer>> _servers;
+        private Dictionary<PadInt, Tuple<RemoteServer,RemoteServer>> _servers;
     }
 
     public class RemoteServer : MarshalByRefObject
