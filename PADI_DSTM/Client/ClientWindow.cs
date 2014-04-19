@@ -10,7 +10,8 @@ using System.Windows.Forms;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
-using PADI_Library;
+using PADI_DSTM;
+using iPADI;
 
 namespace Client
 {
@@ -51,13 +52,13 @@ namespace Client
          */
         private void failButton_Click(object sender, EventArgs e)
         {
-            Library lib = new Library();
+            PadiDstm lib = new PadiDstm();
             lib.Freeze("tcp://localhost:1001/Server");
         }
 
         private void getStatusButton_Click(object sender, EventArgs e)
         {
-            Library lib = new Library();
+            PadiDstm lib = new PadiDstm();
             bool res = lib.Status();
         }
 
@@ -65,7 +66,6 @@ namespace Client
         {
             InitializeRemoteMasterServer();
             connectToMasterServer();
-
         }
     }
 }

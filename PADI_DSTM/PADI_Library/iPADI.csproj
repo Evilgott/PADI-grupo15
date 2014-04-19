@@ -7,7 +7,7 @@
     <ProjectGuid>{5C0A7A5E-52EB-46BB-B954-90782C044C9C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PADI_Library</RootNamespace>
+    <RootNamespace>iPADI</RootNamespace>
     <AssemblyName>PADI_Library</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
