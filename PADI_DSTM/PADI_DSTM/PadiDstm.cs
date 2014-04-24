@@ -27,10 +27,8 @@ namespace PADI_DSTM
 
         public static void Init()
         {
-            RemotingConfiguration.RegisterWellKnownClientType(
-            typeof(RemoteMasterServer), "tcp://localhost:8086/MasterServer"); //port e ip address fixos, MasterServer
 
-            _channel = new TcpChannel();
+            _channel = new TcpChannel(0);
             ChannelServices.RegisterChannel(_channel, true);
             //InitializeRemoteMasterServer();
 
@@ -42,9 +40,7 @@ namespace PADI_DSTM
         public static bool Status()
         {
 
-            TcpChannel channel = new TcpChannel();
-            ChannelServices.RegisterChannel(channel, true);
-
+   
             RemoteMasterServer masterServer = (RemoteMasterServer)Activator.GetObject(
                 typeof(RemoteMasterServer),
                 "tcp://localhost:8086/MasterServer");
@@ -60,7 +56,6 @@ namespace PADI_DSTM
                 server.getServerStatus();
             }
 
-            ChannelServices.UnregisterChannel(channel);
             return true;
         }
         public static bool Fail(string URL)
@@ -109,12 +104,7 @@ namespace PADI_DSTM
         }
 
         public static PadInt CreatePadInt(int uid) {
-            Tuple<String, String> urls = _rMasterServer.getUrl(uid);
-
-            int port = getFreePort();
-
-            TcpChannel tcpChannel = new TcpChannel(port);
-            ChannelServices.RegisterChannel(tcpChannel, true);
+            Tuple<string, string> urls = _rMasterServer.getUrl(uid);
 
             RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer),urls.Item1);
 

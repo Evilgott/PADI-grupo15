@@ -36,15 +36,8 @@ namespace Server
             }
         }
 
-        private void InitializeRemoteMasterServer()
-        {
-            RemotingConfiguration.RegisterWellKnownClientType(
-            typeof(RemoteMasterServer), "tcp://localhost:8086/MasterServer"); //port e ip address fixos, MasterServer
-        }
-
         private void registerOnMasterServer()
         {
-            InitializeRemoteMasterServer();
 
             _rMasterServer = (RemoteMasterServer)Activator.GetObject(
                 typeof(RemoteMasterServer),
