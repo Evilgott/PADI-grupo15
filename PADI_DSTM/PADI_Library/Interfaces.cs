@@ -12,10 +12,10 @@ namespace iPADI
 {
     public class RemoteMasterServer : MarshalByRefObject
     {
-        private int _tId;
-        private ArrayList _primaryServers = new ArrayList();
-        private ArrayList _secondaryServers = new ArrayList();
-        private Dictionary<PadInt, Tuple<RemoteServer,RemoteServer>> _servers;
+        private int _tId = 0;
+        private List<string> _primaryServers = new List<string>();
+        private List<string> _secondaryServers = new List<string>();
+        private Dictionary<int, Tuple<string,string>> _servers;
 
         public String registerServer(String serverURL)
         {
@@ -45,6 +45,21 @@ namespace iPADI
 
             return mergedArray;
         }
+
+        public Tuple<String, String> getUrl(int uid) {
+            if (_servers.ContainsKey(uid))
+            {
+                return _servers[uid];
+            }
+            else {
+                return new Tuple<string, string>(_primaryServers[0], _primaryServers[0]);
+            }
+        }
+
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
     }
 
     public class RemoteServer : MarshalByRefObject
@@ -53,6 +68,7 @@ namespace iPADI
         private string _url;
         private State _serverState = State.normal;
         private ArrayList _calls = new ArrayList();
+        private Dictionary<int, PadInt> padintList; 
 
         public bool changeServerState(String newState)
         {
@@ -67,9 +83,31 @@ namespace iPADI
             Console.WriteLine( _serverState.ToString());
         }
 
+        public string getUrl() {
+            return _url;
+        }
+
+        public PadInt createPadint(int uid)
+        {
+            padintList[uid] = new PadInt();
+            return padintList[uid];
+        }
+
+
+
+
+
+
+
+
+
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
+
         //private Dictionary<PadInt, TX> _wTX; write transactions
         //private Dictionary<PadInt, TX> _rTX; read transactions
         //private List<Requests> _rq;
     }
-
 }

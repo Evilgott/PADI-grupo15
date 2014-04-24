@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using System.Runtime.Remoting.RemotingServices;
 using iPADI;
 
 namespace Server
@@ -23,10 +24,16 @@ namespace Server
             _channel = new TcpChannel(_port);
             ChannelServices.RegisterChannel(_channel, true);
 
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(RemoteServer),
-                "Server",
-                WellKnownObjectMode.Singleton);
+            RemoteServer obj = new RemoteServer();
+
+            try
+            {
+                RemotingServices.Marshal(obj, "Server", typeof(RemoteServer));
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         private void InitializeRemoteMasterServer()

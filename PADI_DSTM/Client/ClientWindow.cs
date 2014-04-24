@@ -17,8 +17,6 @@ namespace Client
 {
     public partial class ClientWindow : Form
     {
-        private TcpChannel _channel;
-        private RemoteMasterServer _rMasterServer;
         private PadInt _copyVal;
 
         public ClientWindow()
@@ -26,21 +24,8 @@ namespace Client
             InitializeComponent();
         }
 
-        private void InitializeRemoteMasterServer()
-        {
-            RemotingConfiguration.RegisterWellKnownClientType(
-            typeof(RemoteMasterServer), "tcp://localhost:8086/MasterServer"); //port e ip address fixos, MasterServer
-        }
-
-        private void connectToMasterServer()
-        {
-            _channel = new TcpChannel();
-            ChannelServices.RegisterChannel(_channel, true);
-            //InitializeRemoteMasterServer();
-
-            _rMasterServer = (RemoteMasterServer)Activator.GetObject(
-                typeof(RemoteMasterServer),
-                "tcp://localhost:8086/MasterServer");
+        private void create(){
+           
         }
 
         private void ClientWindow_Load(object sender, EventArgs e)
@@ -52,20 +37,17 @@ namespace Client
          */
         private void failButton_Click(object sender, EventArgs e)
         {
-            PadiDstm lib = new PadiDstm();
-            lib.Freeze("tcp://localhost:1001/Server");
+            PadiDstm.Freeze("tcp://localhost:1001/Server");
         }
 
         private void getStatusButton_Click(object sender, EventArgs e)
         {
-            PadiDstm lib = new PadiDstm();
-            bool res = lib.Status();
+            PadiDstm.Status();
         }
 
         private void startConButton_Click(object sender, EventArgs e)
         {
-            InitializeRemoteMasterServer();
-            connectToMasterServer();
+
         }
     }
 }

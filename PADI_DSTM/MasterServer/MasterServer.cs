@@ -21,10 +21,16 @@ namespace MasterServer
             _channel = new TcpChannel(_port);
             ChannelServices.RegisterChannel(_channel, true);
 
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(RemoteMasterServer),
-                "MasterServer",
-                WellKnownObjectMode.Singleton);
+            RemoteMasterServer obj = new RemoteMasterServer();
+
+            try
+            {
+                RemotingServices.Marshal(obj, "MasterServer", typeof(RemoteMasterServer));
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
         static void Main(string[] args)
         {
