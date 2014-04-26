@@ -14,14 +14,7 @@ namespace PADI_DSTM
 {
     public static class PadiDstm
     {
-        //URL = "tcp : // <ip-address >:< port > /Server"
-        //TODO:
-        /*
-        bool Init();
-        bool TxBegin();
-        bool TxCommit();
-        bool TxAbort();
-        */
+        
         private static TcpChannel _channel;
         private static RemoteMasterServer _rMasterServer;
 
@@ -60,8 +53,6 @@ namespace PADI_DSTM
         }
         public static bool Fail(string URL)
         {
-            TcpChannel channel = new TcpChannel();
-            ChannelServices.RegisterChannel(channel, true);
 
             RemoteServer server = (RemoteServer)Activator.GetObject(
                 typeof(RemoteServer),
@@ -69,14 +60,11 @@ namespace PADI_DSTM
 
             bool res = server.changeServerState("fail");
 
-            ChannelServices.UnregisterChannel(channel);
             return res;
         }
 
         public static bool Freeze(string URL)
         {
-            TcpChannel channel = new TcpChannel();
-            ChannelServices.RegisterChannel(channel, true);
 
             RemoteServer server = (RemoteServer)Activator.GetObject(
                 typeof(RemoteServer),
@@ -84,14 +72,11 @@ namespace PADI_DSTM
 
             bool res = server.changeServerState("frozen");
 
-            ChannelServices.UnregisterChannel(channel);
             return res;
         }
 
         public static bool Recover(string URL)
         {
-            TcpChannel channel = new TcpChannel();
-            ChannelServices.RegisterChannel(channel, true);
 
             RemoteServer server = (RemoteServer)Activator.GetObject(
                 typeof(RemoteServer),
@@ -99,7 +84,6 @@ namespace PADI_DSTM
 
             bool res = server.changeServerState("recover");
 
-            ChannelServices.UnregisterChannel(channel);
             return res;
         }
 
@@ -137,7 +121,29 @@ namespace PADI_DSTM
             }
             return true;
         }
-        /*PadInt AccessPadInt(int uid);
-         * */
+
+        public static PadInt AccessPadInt(int uid)
+        {
+            Tuple<string, string> urls = _rMasterServer.getUrl(uid);
+
+            RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item1);
+
+            return server.accessPadint(uid);
+        }
+
+        public static bool TxBegin()
+        {
+            return true;
+        }
+
+        public static bool TxCommit()
+        {
+            return true;
+        }
+
+        public static bool TxAbort()
+        {
+            return true;
+        }
     }
 }

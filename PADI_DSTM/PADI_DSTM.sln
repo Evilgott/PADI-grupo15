@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterServer", "MasterServer\MasterServer.csproj", "{8448801D-2F4C-46EB-9D94-AE5167D13270}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iPADI", "PADI_Library\iPADI.csproj", "{5C0A7A5E-52EB-46BB-B954-90782C044C9C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PADI_DSTM", "PADI_DSTM\PADI_DSTM.csproj", "{AE1282AB-9AD8-4F59-8343-F2F6A4404813}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfExample", "ProfExample\ProfExample.csproj", "{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{AE1282AB-9AD8-4F59-8343-F2F6A4404813}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE1282AB-9AD8-4F59-8343-F2F6A4404813}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE1282AB-9AD8-4F59-8343-F2F6A4404813}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

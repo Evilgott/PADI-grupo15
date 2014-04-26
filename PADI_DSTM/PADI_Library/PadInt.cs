@@ -10,13 +10,13 @@ namespace iPADI
     {
        private int shared;
 
-       public void write(int uid)
+       public void Write(int newValue)
        {
            //locks
-           //shared = uid; 
+           shared = newValue; 
        }
 
-       public int read()
+       public int Read()
        {
            return shared;
        }

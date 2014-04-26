@@ -15,11 +15,12 @@ namespace iPADI
         private int _tId = 0;
         private List<string> _primaryServers = new List<string>();
         private List<string> _secondaryServers = new List<string>();
-        private Dictionary<int, Tuple<string,string>> _servers;
+        private Dictionary<int, Tuple<string,string>> _servers = new Dictionary<int,Tuple<string,string>>();
+        private int _lastPadiIntAdded = 0;
 
         public String registerServer(String serverURL)
         {
-            if (_primaryServers.Count % 2 == 0)
+            if ((_primaryServers.Count + _secondaryServers.Count) % 2 == 0)
             {
                 _primaryServers.Add(serverURL);
                 return "primary";
@@ -68,7 +69,7 @@ namespace iPADI
         private string _url;
         private State _serverState = State.normal;
         private ArrayList _calls = new ArrayList();
-        private Dictionary<int, PadInt> padintList; 
+        private Dictionary<int, PadInt> padintList = new Dictionary<int,PadInt>(); 
 
         public bool changeServerState(String newState)
         {
@@ -89,11 +90,14 @@ namespace iPADI
 
         public PadInt createPadint(int uid)
         {
-            padintList[uid] = new PadInt();
+            padintList.Add(uid, new PadInt());
             return padintList[uid];
         }
 
-
+        public PadInt accessPadint(int uid)
+        {
+            return padintList[uid];
+        }
 
 
 
