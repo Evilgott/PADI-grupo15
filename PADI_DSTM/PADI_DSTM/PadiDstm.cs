@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
-using iPADI;
 using System.Net.NetworkInformation;
 
 namespace PADI_DSTM
