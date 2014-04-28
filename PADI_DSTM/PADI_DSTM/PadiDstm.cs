@@ -31,13 +31,7 @@ namespace PADI_DSTM
 
         public static bool Status()
         {
-
-   
-            RemoteMasterServer masterServer = (RemoteMasterServer)Activator.GetObject(
-                typeof(RemoteMasterServer),
-                "tcp://localhost:8086/MasterServer");
-
-            ArrayList allServersURLs = masterServer.getAllServersURLs();
+            ArrayList allServersURLs = _rMasterServer.getAllServersURLs();
 
             foreach (String url in allServersURLs)
             {
@@ -87,12 +81,16 @@ namespace PADI_DSTM
         }
 
         public static PadInt CreatePadInt(int uid) {
+
             Tuple<string, string> urls = _rMasterServer.getUrl(uid);
-
-            RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer),urls.Item1);
-
-            return server.createPadint(uid);
-
+            if(urls!=null){
+                RemoteServer _primaryServer = (RemoteServer)Activator.GetObject(typeof(RemoteServer),urls.Item1);
+                RemoteServer _secondaryServer = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item2);
+                _secondaryServer.createPadint(uid);
+                return _primaryServer.createPadint(uid);
+            }
+            else return null;
+            
         }
 
         private static int getFreePort() {
@@ -123,11 +121,15 @@ namespace PADI_DSTM
 
         public static PadInt AccessPadInt(int uid)
         {
-            Tuple<string, string> urls = _rMasterServer.getUrl(uid);
+            Tuple<string, string> urls = _rMasterServer.getUrlOfPadInt(uid);
 
-            RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item1);
+            if (urls != null)
+            {
+                RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item1);
 
-            return server.accessPadint(uid);
+                return server.accessPadint(uid);
+            }
+            else return null;
         }
 
         public static bool TxBegin()

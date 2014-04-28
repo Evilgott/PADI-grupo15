@@ -24,7 +24,7 @@ namespace Server
             _channel = new TcpChannel(_port);
             ChannelServices.RegisterChannel(_channel, true);
 
-            RemoteServer obj = new RemoteServer();
+            RemoteServer obj = new RemoteServer(port);
 
             try
             {
