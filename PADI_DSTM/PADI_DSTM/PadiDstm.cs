@@ -17,6 +17,18 @@ namespace PADI_DSTM
         private static TcpChannel _channel;
         private static RemoteMasterServer _rMasterServer;
 
+        private static int _actualTxId;
+
+        /* Representa a ligação entre uma transacção e um conjunto 
+         * de PadInts que se encontram associados a esta transacção
+         */
+        private static Dictionary<int, ArrayList> _txPadInts = new Dictionary<int, ArrayList>();
+
+        /* Representa uma lista dos valores originais de todos os PadInts alterados dentro da transacção actual 
+         * {PadIntId, [int OldValue, ServerURL]}
+         */
+        private static Dictionary<int, Tuple<int, string>> _actualTxPadIntOldValues = new Dictionary<int, Tuple<int, string>>();
+
         public static void Init()
         {
 
@@ -46,7 +58,6 @@ namespace PADI_DSTM
         }
         public static bool Fail(string URL)
         {
-
             RemoteServer server = (RemoteServer)Activator.GetObject(
                 typeof(RemoteServer),
                 URL);
@@ -134,16 +145,28 @@ namespace PADI_DSTM
 
         public static bool TxBegin()
         {
+            _actualTxId = _rMasterServer.getNextTxId();
             return true;
         }
 
         public static bool TxCommit()
         {
+            foreach(KeyValuePair<int, Tuple<int,string>> padint in _actualTxPadIntOldValues){
+                RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padint.Value.Item2);
+                server.confirmPadIntChanges(padint.Key, padint.Value.Item1);
+            }
             return true;
         }
 
         public static bool TxAbort()
         {
+            foreach(KeyValuePair<int, Tuple<int,string>> oldPadint in _actualTxPadIntOldValues)
+            {
+
+                RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), oldPadint.Value.Item2);
+                server.revertPadIntChange(_actualTxId, oldPadint.Key, oldPadint.Value.Item1);
+            
+            }
             return true;
         }
     }

@@ -12,7 +12,7 @@ namespace PADI_DSTM
 {
     public class RemoteMasterServer : MarshalByRefObject
     {
-        private int _currentTId = 0;
+        private int _currentTxId = 0;
 
         //string = URL do server
         //int = quantidade de padint's guardados neste servidor
@@ -48,7 +48,7 @@ namespace PADI_DSTM
             {
                 mergedArray.Add(url);
             }
-            foreach (String url in _secondaryServers.Keys)
+            foreach (String url in _secondaryServers.Values)
             {
                 mergedArray.Add(url);
             }
@@ -112,6 +112,13 @@ namespace PADI_DSTM
         {
             return null;
         }
+
+        public int getNextTxId()
+        {
+            int txIdToReturn = _currentTxId;
+            _currentTxId++;
+            return txIdToReturn;
+        }
     }
 
     public class RemoteServer : MarshalByRefObject
@@ -173,16 +180,24 @@ namespace PADI_DSTM
             return padintList[uid];
         }
 
-
-
-
-
-
-
         public override object InitializeLifetimeService()
         {
             return null;
         }
+
+        public bool revertPadIntChange(int txId, int padIntId, int oldValue)
+        {
+            padintList[padIntId].revertChanges(txId, oldValue);
+            return true;
+        }
+
+        public bool confirmPadIntChanges(int txId, int padIntId)
+        {
+            padintList[padIntId].confirmChanges(txId);
+            return true;
+        }
+        
+
 
         //private Dictionary<PadInt, TX> _wTX; write transactions
         //private Dictionary<PadInt, TX> _rTX; read transactions

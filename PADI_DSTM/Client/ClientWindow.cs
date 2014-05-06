@@ -11,7 +11,6 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Channels;
 using PADI_DSTM;
-using iPADI;
 
 namespace Client
 {
@@ -22,6 +21,7 @@ namespace Client
         public ClientWindow()
         {
             InitializeComponent();
+            PadiDstm.Init();
         }
 
         private void create(){
@@ -37,15 +37,30 @@ namespace Client
          */
         private void failButton_Click(object sender, EventArgs e)
         {
-            PadiDstm.Freeze("tcp://localhost:1001/Server");
+            PadiDstm.Fail("tcp://localhost:" + serverPort.Text + "/Server");
+        }
+        
+        private void freeze_Click(object sender, EventArgs e)
+        {
+            PadiDstm.Freeze("tcp://localhost:" + serverPort.Text + "/Server");
+        }
+
+        private void recover_Click(object sender, EventArgs e)
+        {
+            PadiDstm.Recover("tcp://localhost:" + serverPort.Text + "/Server");
         }
 
         private void getStatusButton_Click(object sender, EventArgs e)
         {
             PadiDstm.Status();
         }
-
+        
         private void startConButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void serverPort_TextChanged(object sender, EventArgs e)
         {
 
         }
