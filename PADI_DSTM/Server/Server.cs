@@ -47,7 +47,7 @@ namespace Server
             String name = _rMasterServer.registerServer("tcp://localhost:" + _port + "/Server");
             if (name == "secondary")
             {
-                _rServer.setUpServer(name, "tcp://localhost:" + _port + "/Server");
+                _rServer.setUpServer(name);
             }
             else
             {

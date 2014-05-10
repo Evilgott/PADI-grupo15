@@ -134,6 +134,10 @@ namespace PADI_DSTM
         private State _serverState = State.normal;
         private ArrayList _calls = new ArrayList();
         private Dictionary<int, PadInt> padintList = new Dictionary<int, PadInt>();
+        //timer, delay, imAlive
+        //enviarImAliveSecondary() delay, com timer envia im alives ao secondary
+        //imAliveHandler()
+
 
         private static RemoteMasterServer _rMasterServer;
 
@@ -203,20 +207,21 @@ namespace PADI_DSTM
             return true;
         }
 
-        public void setUpServer(String name, String url)
+        public void setUpServer(String name)
         {
             _name = name; // secondary
-            _otherServerUrl = _rMasterServer.getPrimary(url);
+            _otherServerUrl = _rMasterServer.getPrimary(_url);
             RemoteServer otherServer = (RemoteServer)Activator.GetObject(
             typeof(RemoteServer),
             _otherServerUrl);
 
-            padintList = otherServer.updateReq(); //update his padint list
+            padintList = otherServer.updateReq(_url); //update his padint list, send secondaryserver url to start imalives
         }
         
         //private List<Requests> _rq;
-        public Dictionary<int, PadInt> updateReq()
+        public Dictionary<int, PadInt> updateReq(String url)
         {
+            //startImAlive(url);
             return padintList;
         }
 
