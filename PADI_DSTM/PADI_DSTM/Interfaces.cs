@@ -25,19 +25,20 @@ namespace PADI_DSTM
 
         public String registerServer(String serverURL)
         {
+            //return secondary caso esteja fail
             if ((_primaryServers.Count + _secondaryServers.Count) % 2 == 0)
             {
                 _primaryServers.Add(serverURL, 0);
-                Console.WriteLine("new server: "+serverURL);
+                Console.WriteLine("new server: " + serverURL);
                 return "primary";
             }
             else
             {
-                int primaryIndex = _primaryServers.Count-1;
+                int primaryIndex = _primaryServers.Count - 1;
                 _secondaryServers.Add(_primaryServers.ElementAt(primaryIndex).Key, serverURL);
                 return "secondary";
             }
-
+            
         }
 
         public ArrayList getAllServersURLs()
@@ -119,12 +120,17 @@ namespace PADI_DSTM
             _currentTxId++;
             return txIdToReturn;
         }
+
+        public String getPrimary(String url)
+        {
+            return _secondaryServers[url];
+        }
     }
 
     public class RemoteServer : MarshalByRefObject
     {
         private enum State { normal, frozen, failing };
-        private string _url;
+        private string _url, _name, _otherServerUrl;
         private State _serverState = State.normal;
         private ArrayList _calls = new ArrayList();
         private Dictionary<int, PadInt> padintList = new Dictionary<int, PadInt>();
@@ -196,11 +202,28 @@ namespace PADI_DSTM
             padintList[padIntId].confirmChanges(txId);
             return true;
         }
+
+        public void setUpServer(String name, String url)
+        {
+            _name = name; // secondary
+            _otherServerUrl = _rMasterServer.getPrimary(url);
+            RemoteServer otherServer = (RemoteServer)Activator.GetObject(
+            typeof(RemoteServer),
+            _otherServerUrl);
+
+            padintList = otherServer.updateReq(); //update his padint list
+        }
         
-
-
-        //private Dictionary<PadInt, TX> _wTX; write transactions
-        //private Dictionary<PadInt, TX> _rTX; read transactions
         //private List<Requests> _rq;
+        public Dictionary<int, PadInt> updateReq()
+        {
+            return padintList;
+        }
+
+        public void setName(String name)
+        {
+            _name = name;
+        }
+
     }
 }
