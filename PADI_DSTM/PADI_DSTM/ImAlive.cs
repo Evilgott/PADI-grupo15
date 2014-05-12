@@ -34,4 +34,47 @@ namespace PADI_DSTM
         public void setIsEnabled(bool b) { isEnabled = b; }
 
     }
+
+    class CheckPrimaryLife
+    {
+        private static Timer timer;
+        private double time { get; set; }
+        private bool isAlive { get; set; }
+        private bool isEnabled { get; set; }
+        private static CheckPrimaryLife instance;
+
+        CheckPrimaryLife(bool b)
+        {
+            isAlive = b;
+            timer = new Timer();
+        }
+
+        public static CheckPrimaryLife Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new CheckPrimaryLife(false);
+                }
+                return instance;
+            }
+        }
+
+        public void start()
+        {
+            timer.Elapsed += new ElapsedEventHandler(checkLife);
+            timer.Interval = time;
+            isEnabled = true;
+            timer.Enabled = isEnabled;
+        }
+
+        public void checkLife(object source, ElapsedEventArgs e)
+        {
+            if (!isAlive)
+            {
+                //mudar de secundario para primario
+            }
+        }
+    }
 }
