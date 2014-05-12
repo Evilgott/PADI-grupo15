@@ -134,6 +134,8 @@ namespace PADI_DSTM
         private State _serverState = State.normal;
         private ArrayList _calls = new ArrayList();
         private Dictionary<int, PadInt> padintList = new Dictionary<int, PadInt>();
+        private ImAlive _imAlive;
+
         //timer, delay, imAlive
         //enviarImAliveSecondary() delay, com timer envia im alives ao secondary
         //imAliveHandler()
@@ -221,7 +223,14 @@ namespace PADI_DSTM
         //private List<Requests> _rq;
         public Dictionary<int, PadInt> updateReq(String url)
         {
-            //startImAlive(url);
+            _otherServerUrl = url; //secondary server url
+
+            //create imAlive sender
+            _imAlive = new ImAlive();
+            _imAlive.setTime(2000);
+            _imAlive.setUrl(_otherServerUrl);
+            _imAlive.start(); // sending imAlives to secondary server
+
             return padintList;
         }
 
