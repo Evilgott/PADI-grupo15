@@ -17,6 +17,7 @@ namespace Server
         private int _port;
         String _serverName;
         private RemoteMasterServer _rMasterServer;
+        private RemoteServer _rServer;
 
         Server(int port)
         {
@@ -24,11 +25,11 @@ namespace Server
             _channel = new TcpChannel(_port);
             ChannelServices.RegisterChannel(_channel, true);
 
-            RemoteServer obj = new RemoteServer(port);
+           _rServer = new RemoteServer(port);
 
             try
             {
-                RemotingServices.Marshal(obj, "Server", typeof(RemoteServer));
+                RemotingServices.Marshal(_rServer, "Server", typeof(RemoteServer));
             }
             catch (Exception e)
             {
@@ -43,7 +44,17 @@ namespace Server
                 typeof(RemoteMasterServer),
                 "tcp://localhost:8086/MasterServer");
 
-            Console.WriteLine("Server iniciou como " + _rMasterServer.registerServer("tcp://localhost:"+_port+"/Server"));
+            String name = _rMasterServer.registerServer("tcp://localhost:" + _port + "/Server");
+            if (name == "secondary")
+            {
+                _rServer.setUpServer(name);
+            }
+            else
+            {
+                _rServer.setName("primary");
+            }
+
+            Console.WriteLine("Server iniciou como " + name);
         }
 
         static void Main(string[] args)

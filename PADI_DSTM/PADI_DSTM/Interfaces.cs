@@ -25,15 +25,16 @@ namespace PADI_DSTM
 
         public String registerServer(String serverURL)
         {
+            //return secondary caso esteja fail
             if ((_primaryServers.Count + _secondaryServers.Count) % 2 == 0)
             {
                 _primaryServers.Add(serverURL, 0);
-                Console.WriteLine("new server: "+serverURL);
+                Console.WriteLine("new server: " + serverURL);
                 return "primary";
             }
             else
             {
-                int primaryIndex = _primaryServers.Count-1;
+                int primaryIndex = _primaryServers.Count - 1;
                 _secondaryServers.Add(_primaryServers.ElementAt(primaryIndex).Key, serverURL);
                 return "secondary";
             }
@@ -119,15 +120,26 @@ namespace PADI_DSTM
             _currentTxId++;
             return txIdToReturn;
         }
+
+        public String getPrimary(String url)
+        {
+            return _secondaryServers[url];
+    }
     }
 
     public class RemoteServer : MarshalByRefObject
     {
         private enum State { normal, frozen, failing };
-        private string _url;
+        private string _url, _name, _otherServerUrl;
         private State _serverState = State.normal;
         private ArrayList _calls = new ArrayList();
         private Dictionary<int, PadInt> padintList = new Dictionary<int, PadInt>();
+        private ImAlive _imAlive;
+
+        //timer, delay, imAlive
+        //enviarImAliveSecondary() delay, com timer envia im alives ao secondary
+        //imAliveHandler()
+
 
         private static RemoteMasterServer _rMasterServer;
 
@@ -197,5 +209,35 @@ namespace PADI_DSTM
             return true;
         }
         
+        public void setUpServer(String name)
+        {
+            _name = name; // secondary
+            _otherServerUrl = _rMasterServer.getPrimary(_url);
+            RemoteServer otherServer = (RemoteServer)Activator.GetObject(
+            typeof(RemoteServer),
+            _otherServerUrl);
+
+            padintList = otherServer.updateReq(_url); //update his padint list, send secondaryserver url to start imalives
+        }
+        
+        //private List<Requests> _rq;
+        public Dictionary<int, PadInt> updateReq(String url)
+        {
+            _otherServerUrl = url; //secondary server url
+
+            //create imAlive sender
+            _imAlive = new ImAlive();
+            _imAlive.setTime(2000);
+            _imAlive.setUrl(_otherServerUrl);
+            _imAlive.start(); // sending imAlives to secondary server
+
+            return padintList;
+        }
+
+        public void setName(String name)
+        {
+            _name = name;
+        }
+
     }
 }
