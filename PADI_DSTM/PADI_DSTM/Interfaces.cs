@@ -17,8 +17,8 @@ namespace PADI_DSTM
         //string = URL do server
         //int = quantidade de padint's guardados neste servidor
         private Dictionary<string, int> _primaryServers = new Dictionary<string, int>();
-        //string = URL do secondary server
         //string = URL do primary server
+        //string = URL do secondary server
         private Dictionary<string, string> _secondaryServers = new Dictionary<string, string>();
 
         private Dictionary<int, Tuple<string, string>> _servers = new Dictionary<int, Tuple<string, string>>();
@@ -123,8 +123,12 @@ namespace PADI_DSTM
 
         public String getPrimary(String url)
         {
-            return _secondaryServers[url];
-    }
+            foreach (KeyValuePair<string, string> pair in _secondaryServers)
+            {
+                if(pair.Value.Equals(url)) return pair.Key;
+            }
+            return null;
+        }   
     }
 
     public class RemoteServer : MarshalByRefObject

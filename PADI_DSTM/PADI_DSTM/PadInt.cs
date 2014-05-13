@@ -33,6 +33,18 @@ namespace PADI_DSTM
             }
         }
 
+        public void WriteToServer(int newValue, int txId)
+        {
+            lock (_lockThisPadInt)
+            {
+                foreach(int tx in doneTxs){
+                    if (tx > txId) throw new TxException("Transação de write atrasada");
+                }
+                _shared = newValue;
+                confirmChanges(txId);
+            }
+        }
+
         public int Read()
         {
             return _shared;
@@ -40,10 +52,14 @@ namespace PADI_DSTM
 
         public void revertChanges(int txId, int oldValue)
         {
-            _shared = oldValue;
-            liveReadTxs.Remove(txId);
-            liveWriteTxs.Remove(txId);
-            failedTxs.Add(txId);
+            lock (_lockThisPadInt)
+            {
+                _shared = oldValue;
+                liveReadTxs.Remove(txId);
+                liveWriteTxs.Remove(txId);
+                doneTxs.Remove(txId);
+                failedTxs.Add(txId);
+            }
         }
 
         public void confirmChanges(int txId)

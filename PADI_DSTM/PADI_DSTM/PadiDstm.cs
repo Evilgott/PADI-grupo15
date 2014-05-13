@@ -19,6 +19,8 @@ namespace PADI_DSTM
 
         private static Dictionary<int,PadInt> padIntList = new Dictionary<int,PadInt>();
 
+        private static Dictionary<int, Tuple<String, String>> padintLocations = new Dictionary<int, Tuple<string, string>>();
+
         private static int _actualTxId;
 
         /* Representa a ligação entre uma transacção e um conjunto 
@@ -142,7 +144,9 @@ namespace PADI_DSTM
 
                 PadInt requestedPadInt = server.accessPadint(uid);
 
-                PadInt padintCopy = new PadInt(uid);
+                if(!padintLocations.ContainsKey(uid)) padintLocations.Add(uid, new Tuple<string, string>(urls.Item1, urls.Item2));
+
+                PadInt padintCopy = new PadInt(uid, urls.Item1);
 
                 padintCopy.Write(requestedPadInt.Read());
                 padintCopy.setTxId(_actualTxId);
@@ -165,8 +169,13 @@ namespace PADI_DSTM
             foreach(KeyValuePair<int, PadInt> padint in padIntList){
                 RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padint.Value.getUrl());
                 PadInt padintToChange = server.accessPadint(padint.Key);
-                padintToChange.Write(padint.Value.Read());
+                _actualTxPadIntOldValues.Add(padint.Key, new Tuple<int,String>(padintToChange.Read(), padintToChange.getUrl()));
+                padintToChange.WriteToServer(padint.Value.Read(), _actualTxId);
+                RemoteServer serverBackup = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padintLocations[padint.Key].Item2);
+                padintToChange = serverBackup.accessPadint(padint.Key);
+                padintToChange.WriteToServer(padint.Value.Read(), _actualTxId);
             }
+            _actualTxPadIntOldValues.Clear();
             return true;
         }
 
@@ -177,7 +186,7 @@ namespace PADI_DSTM
 
                 RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), oldPadint.Value.Item2);
                 server.revertPadIntChange(_actualTxId, oldPadint.Key, oldPadint.Value.Item1);
-            
+                
             }
             return true;
         }
