@@ -17,6 +17,8 @@ namespace PADI_DSTM
         private static TcpChannel _channel;
         private static RemoteMasterServer _rMasterServer;
 
+        private static Dictionary<int,PadInt> padIntList = new Dictionary<int,PadInt>();
+
         private static int _actualTxId;
 
         /* Representa a ligação entre uma transacção e um conjunto 
@@ -138,7 +140,16 @@ namespace PADI_DSTM
             {
                 RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item1);
 
-                return server.accessPadint(uid);
+                PadInt requestedPadInt = server.accessPadint(uid);
+
+                PadInt padintCopy = new PadInt(uid);
+
+                padintCopy.Write(requestedPadInt.Read());
+                padintCopy.setTxId(_actualTxId);
+
+                padIntList.Add(uid, padintCopy);
+
+                return padintCopy;
             }
             else return null;
         }
@@ -151,9 +162,10 @@ namespace PADI_DSTM
 
         public static bool TxCommit()
         {
-            foreach(KeyValuePair<int, Tuple<int,string>> padint in _actualTxPadIntOldValues){
-                RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padint.Value.Item2);
-                server.confirmPadIntChanges(padint.Key, padint.Value.Item1);
+            foreach(KeyValuePair<int, PadInt> padint in padIntList){
+                RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padint.Value.getUrl());
+                PadInt padintToChange = server.accessPadint(padint.Key);
+                padintToChange.Write(padint.Value.Read());
             }
             return true;
         }

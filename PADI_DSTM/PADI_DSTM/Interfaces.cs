@@ -164,7 +164,7 @@ namespace PADI_DSTM
         public PadInt createPadint(int uid)
         {
             Console.WriteLine("uid: "+ uid);
-            padintList.Add(uid, new PadInt());
+            padintList.Add(uid, new PadInt(uid, _url));
             Console.WriteLine("O int: " + uid + " foi criado");
             informMasterNewPadInt(uid, _url);
             return padintList[uid];
@@ -197,10 +197,5 @@ namespace PADI_DSTM
             return true;
         }
         
-
-
-        //private Dictionary<PadInt, TX> _wTX; write transactions
-        //private Dictionary<PadInt, TX> _rTX; read transactions
-        //private List<Requests> _rq;
     }
 }
