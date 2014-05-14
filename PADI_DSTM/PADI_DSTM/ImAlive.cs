@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace PADI_DSTM
 {
-    class ImAlive
+    public class ImAlive : MarshalByRefObject
     {
         private static Timer timer;
         private int imAliveTime;
@@ -29,7 +29,12 @@ namespace PADI_DSTM
             isEnabled = true;
             timer.Enabled = isEnabled;
              */
-            timer = new Timer(sendImAlive, null, imAliveTime, Timeout.Infinite);
+         
+            //timer = new Timer(sendImAlive, null, imAliveTime, Timeout.Infinite);
+            Console.WriteLine("im alive start");
+            TimerCallback tcb = sendImAlive;
+            timer = new Timer(tcb, null, imAliveTime, Timeout.Infinite);
+
         }
 
         //esta funcao tem de criar uma mensagem e enviar para o url
@@ -42,11 +47,12 @@ namespace PADI_DSTM
             typeof(RemoteServer),
             _url); //secondary remote server
             CheckPrimaryLife cLife = server.getCheckLife();
+            watch.Start();
+
             cLife.setIsAlive(true);
 
-            watch.Start();
+            
             // Long running operation
-
             timer.Change(Math.Max(0, imAliveTime - watch.ElapsedMilliseconds), Timeout.Infinite);
         }
 
@@ -56,7 +62,7 @@ namespace PADI_DSTM
 
     }
 
-    class CheckPrimaryLife
+    public class CheckPrimaryLife : MarshalByRefObject
     {
         private static Timer timer;
         private int _time;
@@ -80,8 +86,15 @@ namespace PADI_DSTM
             isEnabled = true;
             timer.Enabled = isEnabled;
              */
-            timer = new Timer(checkLife, null, _time, Timeout.Infinite);
+            Console.WriteLine("check life start");
+            TimerCallback tcb = checkLife;
+            timer = new Timer(tcb, null, _time, Timeout.Infinite);
 
+        }
+
+        public void stop()
+        {
+            timer.Dispose();
         }
 
         //public void checkLife(object source, ElapsedEventArgs e)
@@ -99,18 +112,28 @@ namespace PADI_DSTM
                 _deadCount++;
                 if (_deadCount >= 3) //mudar de secundario para primario
                 {
-                    //mudar de secundario para primario TODO!!!
+                    swapToPrimary();
                     _deadCount = 0;
                 }
-                
+                Console.WriteLine("isDead!");
             }
             else
             {
+                Console.WriteLine("isAlive!");
                 _isAlive = false;
             }
 
             timer.Change(Math.Max(0, _time - watch.ElapsedMilliseconds), Timeout.Infinite);
 
+        }
+
+        public void swapToPrimary()
+        {
+             RemoteMasterServer _rMasterServer = (RemoteMasterServer)Activator.GetObject(
+                             typeof(RemoteMasterServer),
+             "tcp://localhost:8086/MasterServer");
+
+             _rMasterServer.swapToPrimaryServer(_url);
         }
 
         public void setIsAlive(bool b) { _isAlive = b; }
