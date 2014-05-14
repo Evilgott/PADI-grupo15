@@ -139,6 +139,7 @@ namespace PADI_DSTM
         private ArrayList _calls = new ArrayList();
         private Dictionary<int, PadInt> padintList = new Dictionary<int, PadInt>();
         private ImAlive _imAlive;
+        private CheckPrimaryLife _checkLife;
 
         //timer, delay, imAlive
         //enviarImAliveSecondary() delay, com timer envia im alives ao secondary
@@ -215,13 +216,18 @@ namespace PADI_DSTM
         
         public void setUpServer(String name)
         {
-            _name = name; // secondary
-            _otherServerUrl = _rMasterServer.getPrimary(_url);
-            RemoteServer otherServer = (RemoteServer)Activator.GetObject(
-            typeof(RemoteServer),
-            _otherServerUrl);
+            _name = name; // secondary or primary
 
-            padintList = otherServer.updateReq(_url); //update his padint list, send secondaryserver url to start imalives
+            if (name == "secondary") { 
+                _otherServerUrl = _rMasterServer.getPrimary(_url);
+                RemoteServer otherServer = (RemoteServer)Activator.GetObject(
+                typeof(RemoteServer),
+                _otherServerUrl);
+
+                _checkLife = new CheckPrimaryLife(false, 2000, _otherServerUrl);
+
+                padintList = otherServer.updateReq(_url); //update his padint list, send secondaryserver url to start imalives
+            }
         }
         
         //private List<Requests> _rq;
@@ -230,10 +236,14 @@ namespace PADI_DSTM
             _otherServerUrl = url; //secondary server url
 
             //create imAlive sender
+            /*
             _imAlive = new ImAlive();
             _imAlive.setTime(2000);
             _imAlive.setUrl(_otherServerUrl);
             _imAlive.start(); // sending imAlives to secondary server
+             */
+            _imAlive = new ImAlive(2000, _otherServerUrl);
+            _imAlive.start();
 
             return padintList;
         }
@@ -242,6 +252,11 @@ namespace PADI_DSTM
         {
             _name = name;
         }
+
+        public ImAlive getImAlive() { return _imAlive;}
+        public CheckPrimaryLife getCheckLife() { return _checkLife;}
+        public void setImAlive(ImAlive a) { _imAlive = a; }
+        public void setCheckPrimaryLife(CheckPrimaryLife c) { _checkLife = c; }
 
     }
 }

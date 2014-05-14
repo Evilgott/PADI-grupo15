@@ -45,14 +45,20 @@ namespace Server
                 "tcp://localhost:8086/MasterServer");
 
             String name = _rMasterServer.registerServer("tcp://localhost:" + _port + "/Server");
+           /*
             if (name == "secondary")
             {
+                //_rServer.setCheckPrimaryLife();
                 _rServer.setUpServer(name);
             }
             else
             {
+                //_rServer.setImAlive()
                 _rServer.setName("primary");
             }
+            */
+
+            _rServer.setUpServer(name);
 
             Console.WriteLine("Server iniciou como " + name);
         }
