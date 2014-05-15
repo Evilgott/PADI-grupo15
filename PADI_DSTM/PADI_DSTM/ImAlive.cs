@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace PADI_DSTM
 {
-    class ImAlive
+    public class ImAlive
     {
         private static Timer timer;
         private int imAliveTime;
@@ -56,7 +56,7 @@ namespace PADI_DSTM
 
     }
 
-    class CheckPrimaryLife
+    public class CheckPrimaryLife
     {
         private static Timer timer;
         private int _time;

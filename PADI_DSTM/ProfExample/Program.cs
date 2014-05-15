@@ -12,7 +12,6 @@ class SampleApp
         res = PadiDstm.TxBegin();
         PadInt pi_a = PadiDstm.CreatePadInt(0);
         PadInt pi_b = PadiDstm.CreatePadInt(1);
-        PadInt pi_c;
         res = PadiDstm.TxCommit();
 
         res = PadiDstm.TxBegin();
@@ -28,8 +27,5 @@ class SampleApp
         res = PadiDstm.Recover("tcp://localhost:2001/Server");
         res = PadiDstm.Fail("tcp://localhost:2002/Server");
         res = PadiDstm.TxCommit();
-
-        System.Console.WriteLine("<enter> para sair...");
-        System.Console.ReadLine();
     }
 }
