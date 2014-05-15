@@ -136,47 +136,104 @@ namespace PADI_DSTM
 
         public static PadInt AccessPadInt(int uid)
         {
-            Tuple<string, string> urls = _rMasterServer.getUrlOfPadInt(uid);
 
-            if (urls != null)
+            try
             {
-                RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item1);
+                Tuple<string, string> urls = _rMasterServer.getUrlOfPadInt(uid);
 
-                PadInt requestedPadInt = server.accessPadint(uid);
+                if (urls != null)
+                {
+                    RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item1);
 
-                if(!padintLocations.ContainsKey(uid)) padintLocations.Add(uid, new Tuple<string, string>(urls.Item1, urls.Item2));
+                    PadInt requestedPadInt = server.accessPadint(uid);
+                    if (!padintLocations.ContainsKey(uid)) padintLocations.Add(uid, new Tuple<string, string>(urls.Item1, urls.Item2));
+                    
+                    PadInt padintCopy = null;
 
-                PadInt padintCopy = new PadInt(uid, urls.Item1);
+                    if (padIntList.ContainsKey(uid))
+                    {
+                        padintCopy = padIntList[uid];
+                    }
+                    else
+                    {
+                        padintCopy = new PadInt(uid, urls.Item1);
+                    }
 
-                padintCopy.Write(requestedPadInt.Read());
-                padintCopy.setTxId(_actualTxId);
 
-                padIntList.Add(uid, padintCopy);
+                    padintCopy.Write(requestedPadInt.Read());
+                    padintCopy.setTxId(_actualTxId);
 
-                return padintCopy;
+                    if (!padIntList.ContainsKey(uid))
+                    {
+                        padIntList.Add(uid, padintCopy);
+                    }
+                    return padintCopy;
+                }
+                else return null;
             }
-            else return null;
+            catch (TxException txE)
+            {
+                Console.WriteLine(txE.Message);
+                return null;
+            }
+            
         }
 
         public static bool TxBegin()
         {
-            _actualTxId = _rMasterServer.getNextTxId();
-            return true;
+            try
+            {
+                _actualTxId = _rMasterServer.getNextTxId();
+                return true;
+            }
+            catch(TxException txE) {
+                Console.WriteLine(txE.Message);
+                return false;
+            }
         }
 
         public static bool TxCommit()
         {
-            foreach(KeyValuePair<int, PadInt> padint in padIntList){
+            /*
+            while (!coord.canCommit())
+            {
+                //fica à espera
+            }
+
+
+            canCommit(){
+                if(podeCommitar){
+                    podeCommitar = false;
+                    return true;
+                }
+                return podeCommitar;
+            }
+            */
+
+            foreach (KeyValuePair<int, PadInt> padint in padIntList)
+            {
                 RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padint.Value.getUrl());
                 PadInt padintToChange = server.accessPadint(padint.Key);
-                _actualTxPadIntOldValues.Add(padint.Key, new Tuple<int,String>(padintToChange.Read(), padintToChange.getUrl()));
-                padintToChange.WriteToServer(padint.Value.Read(), _actualTxId);
+                _actualTxPadIntOldValues.Add(padint.Key, new Tuple<int, String>(padintToChange.Read(), padintToChange.getUrl()));
+                bool commitSuccess = padintToChange.WriteToServer(padint.Value.Read(), _actualTxId);
+                if (!commitSuccess)
+                {
+                    TxAbort();
+                    return false;
+                }
                 RemoteServer serverBackup = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padintLocations[padint.Key].Item2);
                 padintToChange = serverBackup.accessPadint(padint.Key);
                 padintToChange.WriteToServer(padint.Value.Read(), _actualTxId);
+
+                server.printAllInts();
             }
             _actualTxPadIntOldValues.Clear();
+            /*
+            coord.setPodeCommitar(true);
+            */
             return true;
+            
+            
         }
 
         public static bool TxAbort()
@@ -188,6 +245,10 @@ namespace PADI_DSTM
                 server.revertPadIntChange(_actualTxId, oldPadint.Key, oldPadint.Value.Item1);
                 
             }
+            _actualTxPadIntOldValues.Clear();
+            /*
+            coord.setPodeCommitar(true);
+            */
             return true;
         }
     }

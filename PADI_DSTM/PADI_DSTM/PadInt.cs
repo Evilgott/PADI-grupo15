@@ -33,15 +33,28 @@ namespace PADI_DSTM
             }
         }
 
-        public void WriteToServer(int newValue, int txId)
+        public bool WriteToServer(int newValue, int txId)
         {
             lock (_lockThisPadInt)
             {
-                foreach(int tx in doneTxs){
-                    if (tx > txId) throw new TxException("Transação de write atrasada");
+                try
+                {
+                    foreach (int tx in doneTxs)
+                    {
+                        if (tx > txId)
+                        {
+                            throw new TxException("Transação de write atrasada");
+                        }
+                    }
+                    _shared = newValue;
+                    confirmChanges(txId);
+                    return true;
                 }
-                _shared = newValue;
-                confirmChanges(txId);
+                catch (TxException txE)
+                {
+                    Console.WriteLine(txE.Message);
+                    return false;
+                }
             }
         }
 

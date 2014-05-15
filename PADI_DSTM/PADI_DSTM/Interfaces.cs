@@ -21,21 +21,38 @@ namespace PADI_DSTM
         //string = URL do secondary server
         private Dictionary<string, string> _secondaryServers = new Dictionary<string, string>();
 
+        //string = URL do server failed
+        //string = URL do server que substitui (secondary)
+        private Dictionary<string, string> _failedServers = new Dictionary<string, string>();
+
         private Dictionary<int, Tuple<string, string>> _servers = new Dictionary<int, Tuple<string, string>>();
 
         public String registerServer(String serverURL)
         {
-            //return secondary caso esteja fail
+            
+
+            if (_failedServers.ContainsKey(serverURL))
+            {
+
+                string primaryUrl =_failedServers[serverURL];
+                _secondaryServers.Add(primaryUrl, serverURL);
+                _secondaryServers.Remove(serverURL);
+                _failedServers.Remove(serverURL);
+                Console.WriteLine("server recovered is now secondary: " + serverURL);
+                return "secondary";
+            }
+
             if ((_primaryServers.Count + _secondaryServers.Count) % 2 == 0)
             {
                 _primaryServers.Add(serverURL, 0);
-                Console.WriteLine("new server: " + serverURL);
+                Console.WriteLine("new primary server: " + serverURL);
                 return "primary";
             }
             else
             {
                 int primaryIndex = _primaryServers.Count - 1;
                 _secondaryServers.Add(_primaryServers.ElementAt(primaryIndex).Key, serverURL);
+                Console.WriteLine("new secondary server: " + serverURL);
                 return "secondary";
             }
 
@@ -128,7 +145,51 @@ namespace PADI_DSTM
                 if(pair.Value.Equals(url)) return pair.Key;
             }
             return null;
-        }   
+        }
+
+        public void swapToPrimaryServer(string url, string secondaryUrl)
+        {
+            int numInt = _primaryServers[url];
+
+            _primaryServers.Add(secondaryUrl, numInt);
+            _primaryServers.Remove(url);
+
+            _failedServers.Add(url, secondaryUrl);
+
+            swapUrls(url, secondaryUrl);
+
+
+            RemoteServer server = (RemoteServer)Activator.GetObject(
+            typeof(RemoteServer),
+            secondaryUrl); //secondary remote server
+
+            Console.WriteLine("new primary server with url: " + secondaryUrl + " and secondary server with url: " + url);
+
+            //_servers
+
+
+        }
+
+        public void swapUrls(string primaryUrl, string secondaryUrl) {
+
+            Dictionary<int, Tuple<string, string>> temp = new Dictionary<int, Tuple<string, string>>();
+
+            foreach (KeyValuePair<int, Tuple<string, string>> pair in _servers)
+            {
+                if (pair.Value.Item1.Equals(primaryUrl))
+                {
+                    temp.Add(pair.Key, new Tuple<string, string>(secondaryUrl, primaryUrl));
+                }
+                else
+                {
+                    temp.Add(pair.Key, pair.Value);
+                }
+            }
+
+            _servers = temp;
+           
+
+        }
     }
 
     public class RemoteServer : MarshalByRefObject
@@ -140,11 +201,6 @@ namespace PADI_DSTM
         private Dictionary<int, PadInt> padintList = new Dictionary<int, PadInt>();
         private ImAlive _imAlive;
         private CheckPrimaryLife _checkLife;
-
-        //timer, delay, imAlive
-        //enviarImAliveSecondary() delay, com timer envia im alives ao secondary
-        //imAliveHandler()
-
 
         private static RemoteMasterServer _rMasterServer;
 
@@ -218,15 +274,19 @@ namespace PADI_DSTM
         {
             _name = name; // secondary or primary
 
-            if (name == "secondary") { 
-                _otherServerUrl = _rMasterServer.getPrimary(_url);
+            if (name == "secondary") {
+                _imAlive = null; // force it to be null
+
+                _otherServerUrl = _rMasterServer.getPrimary(_url); //url do primary server
                 RemoteServer otherServer = (RemoteServer)Activator.GetObject(
                 typeof(RemoteServer),
                 _otherServerUrl);
 
                 _checkLife = new CheckPrimaryLife(false, 2000, _otherServerUrl);
+                _checkLife.setSecondaryUrl(_url);
 
                 padintList = otherServer.updateReq(_url); //update his padint list, send secondaryserver url to start imalives
+                _checkLife.start();
             }
         }
         
@@ -234,14 +294,8 @@ namespace PADI_DSTM
         public Dictionary<int, PadInt> updateReq(String url)
         {
             _otherServerUrl = url; //secondary server url
+            _checkLife = null; //force it to be null
 
-            //create imAlive sender
-            /*
-            _imAlive = new ImAlive();
-            _imAlive.setTime(2000);
-            _imAlive.setUrl(_otherServerUrl);
-            _imAlive.start(); // sending imAlives to secondary server
-             */
             _imAlive = new ImAlive(2000, _otherServerUrl);
             _imAlive.start();
 
@@ -251,6 +305,13 @@ namespace PADI_DSTM
         public void setName(String name)
         {
             _name = name;
+        }
+
+        public void printAllInts()
+        {
+            foreach(KeyValuePair<int,PadInt> pInt in padintList){
+                Console.WriteLine("inteiro: "+pInt.Key + " valor: "+ pInt.Value.Read());
+            }
         }
 
         public ImAlive getImAlive() { return _imAlive;}
