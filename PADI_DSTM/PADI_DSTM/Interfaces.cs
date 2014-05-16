@@ -318,9 +318,10 @@ namespace PADI_DSTM
             return true;
         }
 
-        public void getServerStatus()
+        public string getServerStatus()
         {
             Console.WriteLine(_serverState.ToString());
+            return _serverState.ToString();
         }
 
         public string getUrl()

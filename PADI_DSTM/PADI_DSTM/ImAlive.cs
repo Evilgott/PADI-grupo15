@@ -43,6 +43,12 @@ namespace PADI_DSTM
             timer.Change(Math.Max(0, imAliveTime - watch.ElapsedMilliseconds), Timeout.Infinite);
         }
 
+        public void stop()
+        {
+            timer.Change(Timeout.Infinite, Timeout.Infinite);
+            timer.Dispose();
+        }
+
         public void setTime(int time) { imAliveTime = time; }
         public void setUrl(string url) { _url = url; }
 
