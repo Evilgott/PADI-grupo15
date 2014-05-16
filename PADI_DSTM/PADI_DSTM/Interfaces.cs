@@ -27,6 +27,18 @@ namespace PADI_DSTM
 
         private Dictionary<int, Tuple<string, string>> _servers = new Dictionary<int, Tuple<string, string>>();
 
+        private string _coordUrl;
+
+        public void registerServerCoord(string coordUrl)
+        {
+            _coordUrl = coordUrl;
+        }
+
+        public string getServerCoordUrl()
+        {
+            return _coordUrl;
+        }
+        
         public String registerServer(String serverURL)
         {
             
@@ -82,6 +94,8 @@ namespace PADI_DSTM
             }
             else
             {
+                Tuple<string,string> newPadintLocation = getServerUrlForNewPadInt();
+                registNewPadInt(uid, newPadintLocation.Item1);
                 return getServerUrlForNewPadInt();
             }
         }
@@ -190,6 +204,45 @@ namespace PADI_DSTM
            
 
         }
+
+        
+    }
+
+
+
+    public class RemoteServerCoord : MarshalByRefObject
+    {
+        private static RemoteMasterServer _rMasterServer;
+        private string _url;
+        private bool _serverCanCommit = true;
+
+        public RemoteServerCoord(int port)
+        {
+
+            _rMasterServer = (RemoteMasterServer)Activator.GetObject(
+                typeof(RemoteMasterServer),
+                "tcp://localhost:8086/MasterServer");
+
+            _url = "tcp://localhost:" + port + "/Server";
+
+            Console.WriteLine("Server URL: " + _url);
+        }
+
+        public bool canCommit()
+        {
+            if (_serverCanCommit)
+            {
+                _serverCanCommit = false;
+                return true;
+            }
+            return false;
+        }
+
+        public void setServerCanCommit(bool newState)
+        {
+            _serverCanCommit = newState;
+        }
+
     }
 
     public class RemoteServer : MarshalByRefObject
@@ -239,7 +292,7 @@ namespace PADI_DSTM
             Console.WriteLine("uid: "+ uid);
             padintList.Add(uid, new PadInt(uid, _url));
             Console.WriteLine("O int: " + uid + " foi criado");
-            informMasterNewPadInt(uid, _url);
+            //informMasterNewPadInt(uid, _url);
             return padintList[uid];
         }
 

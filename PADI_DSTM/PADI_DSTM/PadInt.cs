@@ -43,7 +43,8 @@ namespace PADI_DSTM
                     {
                         if (tx > txId)
                         {
-                            throw new TxException("Transação de write atrasada");
+                            //throw new TxException("Transação de write atrasada");
+                            return false;
                         }
                     }
                     _shared = newValue;

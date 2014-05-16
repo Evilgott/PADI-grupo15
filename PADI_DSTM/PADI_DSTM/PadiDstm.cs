@@ -16,6 +16,7 @@ namespace PADI_DSTM
         
         private static TcpChannel _channel;
         private static RemoteMasterServer _rMasterServer;
+        private static RemoteServerCoord _rServerCoord;
 
         private static Dictionary<int,PadInt> padIntList = new Dictionary<int,PadInt>();
 
@@ -43,6 +44,10 @@ namespace PADI_DSTM
             _rMasterServer = (RemoteMasterServer)Activator.GetObject(
                 typeof(RemoteMasterServer),
                 "tcp://localhost:8086/MasterServer");
+
+            _rServerCoord = (RemoteServerCoord)Activator.GetObject(
+                typeof(RemoteServerCoord),
+                _rMasterServer.getServerCoordUrl());
         }
 
         public static bool Status()
@@ -194,21 +199,14 @@ namespace PADI_DSTM
 
         public static bool TxCommit()
         {
-            /*
-            while (!coord.canCommit())
+            Console.WriteLine("Entrei no commit");
+            while (!_rServerCoord.canCommit())
             {
                 //fica à espera
+                Console.WriteLine("deu falso");
             }
 
-
-            canCommit(){
-                if(podeCommitar){
-                    podeCommitar = false;
-                    return true;
-                }
-                return podeCommitar;
-            }
-            */
+            Console.WriteLine("deu true");
 
             foreach (KeyValuePair<int, PadInt> padint in padIntList)
             {
@@ -228,9 +226,9 @@ namespace PADI_DSTM
                 server.printAllInts();
             }
             _actualTxPadIntOldValues.Clear();
-            /*
-            coord.setPodeCommitar(true);
-            */
+
+            _rServerCoord.setServerCanCommit(true);
+            
             return true;
             
             
@@ -246,9 +244,9 @@ namespace PADI_DSTM
                 
             }
             _actualTxPadIntOldValues.Clear();
-            /*
-            coord.setPodeCommitar(true);
-            */
+            
+            _rServerCoord.setServerCanCommit(true);
+            
             return true;
         }
     }

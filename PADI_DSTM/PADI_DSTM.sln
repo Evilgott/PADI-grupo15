@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PADI_DSTM", "PADI_DSTM\PADI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProfExample", "ProfExample\ProfExample.csproj", "{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerCoord", "ServerCoord\ServerCoord.csproj", "{EFC22E1E-1AD5-43FB-95C1-6E02A10ECD88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89A891DF-3A0D-4F8A-B77E-8F2F5589C5D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFC22E1E-1AD5-43FB-95C1-6E02A10ECD88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFC22E1E-1AD5-43FB-95C1-6E02A10ECD88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFC22E1E-1AD5-43FB-95C1-6E02A10ECD88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFC22E1E-1AD5-43FB-95C1-6E02A10ECD88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
