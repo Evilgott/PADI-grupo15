@@ -191,7 +191,6 @@ namespace PADI_DSTM
             try
             {
                 _actualTxId = _rMasterServer.getNextTxId();
-                padIntList.Clear();
                 return true;
             }
             catch(TxException txE) {
@@ -202,7 +201,7 @@ namespace PADI_DSTM
 
         public static bool TxCommit()
         {
-            Console.WriteLine("entrei aqui");
+            
             
             ArrayList padintListToSend = new ArrayList();
             foreach (KeyValuePair<int, PadInt> pair in padIntList)
@@ -210,13 +209,11 @@ namespace PADI_DSTM
                 padintListToSend.Add(pair.Key);
             }
 
-            bool res = _rServerCoord.tryBlockAllPadInts(padintListToSend);
-
-            while (!res)
+            while (!_rServerCoord.tryBlockAllPadInts(padintListToSend))
             {
-                //wait for commit autorizathion
+                Console.WriteLine("entrei aqui " + _rServerCoord.getListLenght());
+                Console.WriteLine("################ Estou no while ###################");
             }
-            //Console.WriteLine("cheguei aqui++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
             foreach (KeyValuePair<int, PadInt> padint in padIntList)
             {
@@ -239,12 +236,14 @@ namespace PADI_DSTM
                 server.printAllInts();
             }
 
-            _actualTxPadIntOldValues.Clear();
-
             _rServerCoord.unblokcPadIntsBlocked(padintListToSend);
 
-            
-            
+            _actualTxPadIntOldValues.Clear();
+
+            padIntList.Clear();
+
+            Console.WriteLine("Lista de padints: "+ padIntList.Count());
+
             return true;
             
             
@@ -259,9 +258,20 @@ namespace PADI_DSTM
                 server.revertPadIntChange(_actualTxId, oldPadint.Key, oldPadint.Value.Item1);
                 
             }
+
+            ArrayList padintListToSend = new ArrayList();
+            foreach (KeyValuePair<int, PadInt> pair in padIntList)
+            {
+                padintListToSend.Add(pair.Key);
+            }
+
+            _rServerCoord.unblokcPadIntsBlocked(padintListToSend);
+
             _actualTxPadIntOldValues.Clear();
-            
-            _rServerCoord.setServerCanCommit(true);
+
+            padIntList.Clear();
+
+            Console.WriteLine("Lista de padints: " + padIntList.Count());
             
             return true;
         }

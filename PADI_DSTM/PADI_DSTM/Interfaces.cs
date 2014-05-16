@@ -249,12 +249,14 @@ namespace PADI_DSTM
             padIntsToCommit.Add(padintId);
         }
 
+        public int getListLenght()
+        {
+            return padIntsToCommit.Count;
+        }
+
         public bool tryBlockAllPadInts(ArrayList padintList)
         {
-            Console.WriteLine("entrei");
             lock(_lockServer){
-
-                Console.WriteLine("entrei");
                 
                 foreach(int key in padintList){
                     if(padIntsToCommit.Contains(key)){
@@ -266,7 +268,6 @@ namespace PADI_DSTM
                     padIntsToCommit.Add(key);
                 }
                 
-                Console.WriteLine("sai");
                 return true;
 
             }

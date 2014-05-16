@@ -7,6 +7,7 @@ using System.Collections;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
+using PADI_DSTM;
 
 namespace PADI_DSTM
 {
@@ -110,32 +111,40 @@ namespace PADI_DSTM
 
         public void Write(int newValue)
         {
-            lock (_lockThisPadInt)
+            try
             {
-                RemoteServer server = (RemoteServer)Activator.GetObject(
-                typeof(RemoteServer),
-                _serverUrl);
-                PadInt padintToSynch = server.accessPadint(_id);
-                padintToSynch.setLiveWriteTxs(txId);
-                setLiveReadTxs(txId);
-
-                foreach (int i in doneWriteTxs)
+                lock (_lockThisPadInt)
                 {
-                    if (txId < i)
-                    {
-                        //throw new TxException("Cannot write the value invalid transaction");
-                    }
-                }
-                foreach (int i in doneReadTxs)
-                {
-                    if (txId < i)
-                    {
-                        //throw new TxException("Cannot write the value invalid transaction");
-                    }
-                }
+                    RemoteServer server = (RemoteServer)Activator.GetObject(
+                    typeof(RemoteServer),
+                    _serverUrl);
+                    PadInt padintToSynch = server.accessPadint(_id);
+                    padintToSynch.setLiveWriteTxs(txId);
+                    setLiveReadTxs(txId);
 
-                _shared = newValue;
+                    foreach (int i in doneWriteTxs)
+                    {
+                        if (txId < i)
+                        {
+                            throw new TxException("Cannot write the value invalid transaction");
+                        }
+                    }
+                    foreach (int i in doneReadTxs)
+                    {
+                        if (txId < i)
+                        {
+                            throw new TxException("Cannot write the value invalid transaction");
+                        }
+                    }
+
+                    _shared = newValue;
+                }
             }
+            catch (TxException e)
+            {
+                //PadiDstm.TxAbort();
+            }
+            
         }
 
         public string getTxs()
