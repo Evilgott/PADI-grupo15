@@ -73,6 +73,9 @@ namespace PADI_DSTM
 
             bool res = server.changeServerState("fail");
 
+            ImAlive a = server.getImAlive();
+            a.stop();
+
             return res;
         }
 
@@ -95,7 +98,16 @@ namespace PADI_DSTM
                 typeof(RemoteServer),
                 URL);
 
+            string status = server.getServerStatus();
+
+            if (status.Equals("failing"))
+            {
+                _rMasterServer.registerServer(server.getUrl());
+                server.setUpServer("secondary");
+            } 
+
             bool res = server.changeServerState("recover");
+            
 
             return res;
         }
