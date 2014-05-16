@@ -151,6 +151,9 @@ namespace PADI_DSTM
                     RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), urls.Item1);
 
                     PadInt requestedPadInt = server.accessPadint(uid);
+
+                    Console.WriteLine("a lista de writes TXs " + requestedPadInt.getTxs());
+
                     if (!padintLocations.ContainsKey(uid)) padintLocations.Add(uid, new Tuple<string, string>(urls.Item1, urls.Item2));
                     
                     PadInt padintCopy = null;
@@ -188,6 +191,7 @@ namespace PADI_DSTM
             try
             {
                 _actualTxId = _rMasterServer.getNextTxId();
+                padIntList.Clear();
                 return true;
             }
             catch(TxException txE) {
@@ -198,17 +202,27 @@ namespace PADI_DSTM
 
         public static bool TxCommit()
         {
-            Console.WriteLine("Entrei no commit");
-            while (!_rServerCoord.canCommit())
+            Console.WriteLine("entrei aqui");
+            
+            ArrayList padintListToSend = new ArrayList();
+            foreach (KeyValuePair<int, PadInt> pair in padIntList)
             {
-                //fica à espera
-                Console.WriteLine("deu falso");
+                padintListToSend.Add(pair.Key);
             }
 
-            Console.WriteLine("deu true");
+            bool res = _rServerCoord.tryBlockAllPadInts(padintListToSend);
+
+            while (!res)
+            {
+                //wait for commit autorizathion
+            }
+            //Console.WriteLine("cheguei aqui++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
             foreach (KeyValuePair<int, PadInt> padint in padIntList)
             {
+
+                
+
                 RemoteServer server = (RemoteServer)Activator.GetObject(typeof(RemoteServer), padint.Value.getUrl());
                 PadInt padintToChange = server.accessPadint(padint.Key);
                 _actualTxPadIntOldValues.Add(padint.Key, new Tuple<int, String>(padintToChange.Read(), padintToChange.getUrl()));
@@ -224,9 +238,12 @@ namespace PADI_DSTM
 
                 server.printAllInts();
             }
+
             _actualTxPadIntOldValues.Clear();
 
-            _rServerCoord.setServerCanCommit(true);
+            _rServerCoord.unblokcPadIntsBlocked(padintListToSend);
+
+            
             
             return true;
             

@@ -38,6 +38,46 @@ namespace PADI_DSTM
             }
         }
 
+        public void setLiveWriteTxs(int txId)
+        {
+            if (!liveWriteTxs.Contains(txId))
+            {
+                liveWriteTxs.Add(txId);
+            }
+        }
+
+        public void setDoneReadTxs(int txId)
+        {
+            if (!liveWriteTxs.Contains(txId))
+            {
+                liveWriteTxs.Add(txId);
+            }
+        }
+
+        public void setDoneWriteTxs(int txId)
+        {
+            if (!liveWriteTxs.Contains(txId))
+            {
+                liveWriteTxs.Add(txId);
+            }
+        }
+
+        public void setFailedTxs(int txId)
+        {
+            if (!failedTxs.Contains(txId))
+            {
+                failedTxs.Add(txId);
+            }
+        }
+
+        public void setDoneTxs(int txId)
+        {
+            if (!doneTxs.Contains(txId))
+            {
+                doneTxs.Add(txId);
+            }
+        }
+
         public ArrayList getAllLocalVariables()
         {
             ArrayList arrayToReturn = new ArrayList();
@@ -75,9 +115,37 @@ namespace PADI_DSTM
                 RemoteServer server = (RemoteServer)Activator.GetObject(
                 typeof(RemoteServer),
                 _serverUrl);
-                server.accessPadint(_id);
+                PadInt padintToSynch = server.accessPadint(_id);
+                padintToSynch.setLiveWriteTxs(txId);
+                setLiveReadTxs(txId);
+
+                foreach (int i in doneWriteTxs)
+                {
+                    if (txId < i)
+                    {
+                        //throw new TxException("Cannot write the value invalid transaction");
+                    }
+                }
+                foreach (int i in doneReadTxs)
+                {
+                    if (txId < i)
+                    {
+                        //throw new TxException("Cannot write the value invalid transaction");
+                    }
+                }
+
                 _shared = newValue;
             }
+        }
+
+        public string getTxs()
+        {
+            string s = "";
+            foreach (int i in liveWriteTxs)
+            {
+                s = s + i;
+            }
+            return s;
         }
 
         public bool WriteToServer(int newValue, int txId)
@@ -86,7 +154,15 @@ namespace PADI_DSTM
             {
                 try
                 {
-                    foreach (int tx in doneTxs)
+                    foreach (int tx in doneReadTxs)
+                    {
+                        if (tx > txId)
+                        {
+                            //throw new TxException("Transação de write atrasada");
+                            return false;
+                        }
+                    }
+                    foreach (int tx in doneWriteTxs)
                     {
                         if (tx > txId)
                         {
@@ -108,7 +184,12 @@ namespace PADI_DSTM
 
         public int Read()
         {
-
+            RemoteServer server = (RemoteServer)Activator.GetObject(
+                typeof(RemoteServer),
+                _serverUrl);
+            PadInt padintToSynch = server.accessPadint(_id);
+            padintToSynch.setLiveReadTxs(txId);
+            setLiveReadTxs(txId);
             return _shared;
         }
 
@@ -119,6 +200,8 @@ namespace PADI_DSTM
                 _shared = oldValue;
                 liveReadTxs.Remove(txId);
                 liveWriteTxs.Remove(txId);
+                doneReadTxs.Remove(txId);
+                doneWriteTxs.Remove(txId);
                 doneTxs.Remove(txId);
                 failedTxs.Add(txId);
             }
@@ -126,9 +209,17 @@ namespace PADI_DSTM
 
         public void confirmChanges(int txId)
         {
-            liveReadTxs.Remove(txId);
-            liveWriteTxs.Remove(txId);
-            doneTxs.Add(txId);
+            if (liveReadTxs.Contains(txId))
+            {
+                liveReadTxs.Remove(txId);
+                doneReadTxs.Add(txId);
+            }
+            if(liveWriteTxs.Contains(txId))
+            {
+                liveWriteTxs.Remove(txId);
+                doneWriteTxs.Add(txId);
+            }
+                        
         }
 
         public void setTxId(int newTxId){

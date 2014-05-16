@@ -216,6 +216,7 @@ namespace PADI_DSTM
         private string _url;
         private bool _serverCanCommit = true;
         private ArrayList padIntsToCommit = new ArrayList();
+        private Object _lockServer = new Object();
 
         public RemoteServerCoord(int port)
         {
@@ -229,19 +230,57 @@ namespace PADI_DSTM
             Console.WriteLine("Server URL: " + _url);
         }
 
-        public bool canCommit()
+        public bool canCommit(int padintId)
         {
-            if (_serverCanCommit)
+            if (padIntsToCommit.Contains(padintId))
             {
-                _serverCanCommit = false;
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         public void setServerCanCommit(bool newState)
         {
             _serverCanCommit = newState;
+        }
+
+        public void addPadintsBeingCommited(int padintId)
+        {
+            padIntsToCommit.Add(padintId);
+        }
+
+        public bool tryBlockAllPadInts(ArrayList padintList)
+        {
+            Console.WriteLine("entrei");
+            lock(_lockServer){
+
+                Console.WriteLine("entrei");
+                
+                foreach(int key in padintList){
+                    if(padIntsToCommit.Contains(key)){
+                        return false;
+                    }
+                }
+                foreach (int key in padintList)
+                {
+                    padIntsToCommit.Add(key);
+                }
+                
+                Console.WriteLine("sai");
+                return true;
+
+            }
+        }
+
+        public void unblokcPadIntsBlocked(ArrayList padintList)
+        {
+            foreach(int key in padintList)
+            {
+                if (padIntsToCommit.Contains(key))
+                {
+                    padIntsToCommit.Remove(key);
+                }
+            }
         }
 
     }
