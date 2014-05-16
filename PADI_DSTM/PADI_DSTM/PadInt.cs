@@ -142,7 +142,7 @@ namespace PADI_DSTM
             }
             catch (TxException e)
             {
-                //PadiDstm.TxAbort();
+                PadiDstm.TxAbort();
             }
             
         }

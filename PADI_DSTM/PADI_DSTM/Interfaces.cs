@@ -96,7 +96,7 @@ namespace PADI_DSTM
             {
                 Tuple<string,string> newPadintLocation = getServerUrlForNewPadInt();
                 registNewPadInt(uid, newPadintLocation.Item1);
-                return getServerUrlForNewPadInt();
+                return newPadintLocation;
             }
         }
 
