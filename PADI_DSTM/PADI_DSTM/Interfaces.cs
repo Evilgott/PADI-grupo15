@@ -336,10 +336,7 @@ namespace PADI_DSTM
             {
                 if(_serverState.Equals(State.failing)) throw new TxException("Can't do the request. Server state = failing");
 
-                Console.WriteLine("uid: " + uid);
                 padintList.Add(uid, new PadInt(uid, _url));
-                Console.WriteLine("O int: " + uid + " foi criado");
-                //informMasterNewPadInt(uid, _url);
                 return padintList[uid];
             }
             catch (TxException txE)
@@ -350,10 +347,6 @@ namespace PADI_DSTM
 
         }
 
-        private bool informMasterNewPadInt(int uid, string url)
-        {
-            return _rMasterServer.registNewPadInt(uid, url);
-        }
 
         public PadInt accessPadint(int uid)
         {
@@ -451,12 +444,14 @@ namespace PADI_DSTM
             _name = name;
         }
 
+        /*
         public void printAllInts()
         {
             foreach(KeyValuePair<int,PadInt> pInt in padintList){
                 Console.WriteLine("inteiro: "+pInt.Key + " valor: "+ pInt.Value.Read());
             }
         }
+         */
 
         public ImAlive getImAlive() { return _imAlive;}
         public CheckPrimaryLife getCheckLife() { return _checkLife;}

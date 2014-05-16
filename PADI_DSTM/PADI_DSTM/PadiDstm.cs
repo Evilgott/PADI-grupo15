@@ -164,7 +164,6 @@ namespace PADI_DSTM
 
                     PadInt requestedPadInt = server.accessPadint(uid);
 
-                    Console.WriteLine("a lista de writes TXs " + requestedPadInt.getTxs());
 
                     if (!padintLocations.ContainsKey(uid)) padintLocations.Add(uid, new Tuple<string, string>(urls.Item1, urls.Item2));
                     
@@ -223,8 +222,7 @@ namespace PADI_DSTM
 
             while (!_rServerCoord.tryBlockAllPadInts(padintListToSend))
             {
-                Console.WriteLine("entrei aqui " + _rServerCoord.getListLenght());
-                Console.WriteLine("################ Estou no while ###################");
+                //waiting for commit authorization
             }
 
             foreach (KeyValuePair<int, PadInt> padint in padIntList)
@@ -245,7 +243,6 @@ namespace PADI_DSTM
                 padintToChange = serverBackup.accessPadint(padint.Key);
                 padintToChange.WriteToServer(padint.Value.Read(), _actualTxId);
 
-                server.printAllInts();
             }
 
             _rServerCoord.unblokcPadIntsBlocked(padintListToSend);
@@ -254,7 +251,6 @@ namespace PADI_DSTM
 
             padIntList.Clear();
 
-            Console.WriteLine("Lista de padints: "+ padIntList.Count());
 
             return true;
             
@@ -263,6 +259,7 @@ namespace PADI_DSTM
 
         public static bool TxAbort()
         {
+
             foreach(KeyValuePair<int, Tuple<int,string>> oldPadint in _actualTxPadIntOldValues)
             {
 
@@ -283,7 +280,6 @@ namespace PADI_DSTM
 
             padIntList.Clear();
 
-            Console.WriteLine("Lista de padints: " + padIntList.Count());
             
             return true;
         }
