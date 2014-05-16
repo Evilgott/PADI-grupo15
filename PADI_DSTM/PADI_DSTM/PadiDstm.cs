@@ -164,8 +164,7 @@ namespace PADI_DSTM
                         padintCopy = new PadInt(uid, urls.Item1);
                     }
 
-
-                    padintCopy.Write(requestedPadInt.Read());
+                    padintCopy.setAllLocalVariables(requestedPadInt.getAllLocalVariables());
                     padintCopy.setTxId(_actualTxId);
 
                     if (!padIntList.ContainsKey(uid))

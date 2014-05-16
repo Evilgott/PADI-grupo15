@@ -215,6 +215,7 @@ namespace PADI_DSTM
         private static RemoteMasterServer _rMasterServer;
         private string _url;
         private bool _serverCanCommit = true;
+        private ArrayList padIntsToCommit = new ArrayList();
 
         public RemoteServerCoord(int port)
         {
