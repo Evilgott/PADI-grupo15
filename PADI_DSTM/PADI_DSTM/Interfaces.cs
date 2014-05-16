@@ -290,11 +290,23 @@ namespace PADI_DSTM
 
         public PadInt createPadint(int uid)
         {
-            Console.WriteLine("uid: "+ uid);
-            padintList.Add(uid, new PadInt(uid, _url));
-            Console.WriteLine("O int: " + uid + " foi criado");
-            //informMasterNewPadInt(uid, _url);
-            return padintList[uid];
+            while (_serverState.Equals(State.frozen)) { }
+            try
+            {
+                if(_serverState.Equals(State.failing)) throw new TxException("Can't do the request. Server state = failing");
+
+                Console.WriteLine("uid: " + uid);
+                padintList.Add(uid, new PadInt(uid, _url));
+                Console.WriteLine("O int: " + uid + " foi criado");
+                //informMasterNewPadInt(uid, _url);
+                return padintList[uid];
+            }
+            catch (TxException txE)
+            {
+                Console.WriteLine(txE.Message);
+                return null;
+            }
+
         }
 
         private bool informMasterNewPadInt(int uid, string url)
@@ -304,7 +316,19 @@ namespace PADI_DSTM
 
         public PadInt accessPadint(int uid)
         {
-            return padintList[uid];
+            while (_serverState.Equals(State.frozen)) { }
+            try
+            {
+                if (_serverState.Equals(State.failing)) throw new TxException("Can't do the request. Server state = failing");
+
+                return padintList[uid];
+            }
+            catch (TxException txE)
+            {
+                Console.WriteLine(txE.Message);
+                return null;
+            }
+            
         }
 
         public override object InitializeLifetimeService()
@@ -314,14 +338,39 @@ namespace PADI_DSTM
 
         public bool revertPadIntChange(int txId, int padIntId, int oldValue)
         {
-            padintList[padIntId].revertChanges(txId, oldValue);
-            return true;
+            while (_serverState.Equals(State.frozen)) { }
+            try
+            {
+                if (_serverState.Equals(State.failing)) throw new TxException("Can't do the request. Server state = failing");
+
+                padintList[padIntId].revertChanges(txId, oldValue);
+                return true;
+            }
+            catch (TxException txE)
+            {
+                Console.WriteLine(txE.Message);
+                return false;
+            }
+
+            
         }
 
         public bool confirmPadIntChanges(int txId, int padIntId)
         {
-            padintList[padIntId].confirmChanges(txId);
-            return true;
+            while (_serverState.Equals(State.frozen)) { }
+            try
+            {
+                if (_serverState.Equals(State.failing)) throw new TxException("Can't do the request. Server state = failing");
+
+                padintList[padIntId].confirmChanges(txId);
+                return true;
+            }
+            catch (TxException txE)
+            {
+                Console.WriteLine(txE.Message);
+                return false;
+            }
+ 
         }
         
         public void setUpServer(String name)
